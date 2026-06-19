@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LPSC Fee & Fundraising Slider</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --accent: #2563eb;
+      --good: #16a34a;
+      --warn: #dc2626;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 22px;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    .sub { margin: 0 0 22px; color: var(--muted); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+    .full { grid-column: 1 / -1; }
+    .control { margin: 0 0 22px; }
+    .label-row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+    label { font-weight: 700; }
+    .value { font-size: 20px; font-weight: 800; color: var(--accent); }
+    input[type="range"] { width: 100%; margin-top: 10px; }
+    .minmax { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fafafa;
+    }
+    .stat .name { color: var(--muted); font-size: 13px; margin-bottom: 5px; }
+    .stat .num { font-size: 24px; font-weight: 900; }
+    .bar-wrap { margin-top: 14px; }
+    .bar-title { display:flex; justify-content:space-between; font-weight:700; margin-bottom:6px; }
+    .bar-bg { height: 28px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    .bar { height: 100%; width: 0%; background: var(--accent); transition: width .15s ease; }
+    .bar.fund { background: var(--good); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px; border-bottom: 1px solid var(--line); text-align: right; }
+    th:first-child, td:first-child { text-align: left; }
+    th { color: var(--muted); font-weight: 700; }
+    .note { color: var(--muted); font-size: 13px; line-height: 1.45; margin-top: 12px; }
+    @media (max-width: 760px) {
+      body { padding: 12px; }
+      .grid, .stat-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 23px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>LPSC Fee & Fundraising Slider</h1>
+    <p class="sub">Move the sliders to see how player fees, roster size, and fundraiser support affect the team budget. On iPhone, open in Safari rather than the Files preview for live updating.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="control">
+          <div class="label-row"><label for="fee">Player Fee</label><span class="value" id="feeVal">$650</span></div>
+          <input id="fee" type="range" min="400" max="800" step="25" value="650" />
+          <div class="minmax"><span>$400</span><span>$800</span></div>
+        </div>
+        <div class="control">
+          <div class="label-row"><label for="players">Roster Size</label><span class="value" id="playersVal">11</span></div>
+          <input id="players" type="range" min="10" max="12" step="1" value="11" />
+          <div class="minmax"><span>10</span><span>12</span></div>
+        </div>
+        <div class="control">
+          <div class="label-row"><label for="budget">Team Budget Need</label><span class="value" id="budgetVal">$10,000</span></div>
+          <input id="budget" type="range" min="7000" max="10000" step="250" value="10000" />
+          <div class="minmax"><span>$7,000</span><span>$10,000</span></div>
+        </div>
+        <div class="control">
+          <div class="label-row"><label for="buyout">Fundraiser Buyout per Player</label><span class="value" id="buyoutVal">$400</span></div>
+          <input id="buyout" type="range" min="0" max="2" step="1" value="2" />
+          <div class="minmax"><span>$0</span><span>$250</span><span>$400</span></div>
+        </div>
+        <div class="control" style="margin-bottom:0;">
+          <div class="label-row"><label for="buyoutPct">Players Buying Out</label><span class="value" id="buyoutPctVal">50%</span></div>
+          <input id="buyoutPct" type="range" min="0" max="100" step="5" value="50" />
+          <div class="minmax"><span>0%</span><span>100%</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="stat-grid">
+          <div class="stat"><div class="name">Team Fee Income</div><div class="num" id="feeIncome">$7,150</div></div>
+          <div class="stat"><div class="name">Expected Buyout Income</div><div class="num" id="buyoutIncome">$2,200</div></div>
+          <div class="stat"><div class="name">Total Income Before Fundraising</div><div class="num" id="totalIncome">$9,350</div></div>
+          <div class="stat"><div class="name">Fundraiser Support Needed</div><div class="num" id="fundNeeded">$650</div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-title"><span>Fee + Buyout Coverage</span><span id="coveragePct">94%</span></div>
+          <div class="bar-bg"><div class="bar" id="coverageBar" style="width:93.5%"></div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-title"><span>Fundraiser Support</span><span id="fundPct">6%</span></div>
+          <div class="bar-bg"><div class="bar fund" id="fundBar" style="width:6.5%"></div></div>
+        </div>
+        <p class="note">Formula: player fee income + expected buyout income reduces the remaining budget gap. Any remaining gap is shown as fundraiser support needed.</p>
+      </div>
+
+      <div class="card full">
+        <h2 style="margin-top:0;">Quick Comparison</h2>
+        <table>
+          <thead>
+            <tr><th>Scenario</th><th>Player Fee</th><th>Fee Income</th><th>Total Before Fundraising</th><th>Fundraiser Support Needed</th></tr>
+          </thead>
+          <tbody id="scenarioRows"><tr><td>$550</td><td>$550</td><td>$6,050</td><td>$8,250</td><td>$1,750</td></tr><tr><td>$600</td><td>$600</td><td>$6,600</td><td>$8,800</td><td>$1,200</td></tr><tr><td>Current</td><td>$650</td><td>$7,150</td><td>$9,350</td><td>$650</td></tr><tr><td>$700</td><td>$700</td><td>$7,700</td><td>$9,900</td><td>$100</td></tr><tr><td>$750</td><td>$750</td><td>$8,250</td><td>$10,450</td><td>$0</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const el = id => document.getElementById(id);
+    const money = n => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+    const pct = n => `${Math.round(n)}%`;
+
+    const buyoutOptions = [0, 250, 400];
+
+    const inputs = ['fee','players','budget','buyout','buyoutPct'].map(el);
+    inputs.forEach(i => {
+      i.addEventListener('input', update);
+      i.addEventListener('change', update);
+    });
+
+    function calc(fee) {
+      const players = +el('players').value;
+      const budget = +el('budget').value;
+      const buyout = buyoutOptions[+el('buyout').value];
+      const buyoutPct = +el('buyoutPct').value / 100;
+      const feeIncome = fee * players;
+      const buyoutIncome = players * buyoutPct * buyout;
+      const totalIncome = feeIncome + buyoutIncome;
+      const fundNeeded = Math.max(0, budget - totalIncome);
+      return { fee, players, budget, buyoutIncome, feeIncome, totalIncome, fundNeeded };
+    }
+
+    function update() {
+      const fee = +el('fee').value;
+      const c = calc(fee);
+
+      el('feeVal').textContent = money(fee);
+      el('playersVal').textContent = c.players;
+      el('budgetVal').textContent = money(c.budget);
+      el('buyoutVal').textContent = money(buyoutOptions[+el('buyout').value]);
+      el('buyoutPctVal').textContent = el('buyoutPct').value + '%';
+
+      el('feeIncome').textContent = money(c.feeIncome);
+      el('buyoutIncome').textContent = money(c.buyoutIncome);
+      el('totalIncome').textContent = money(c.totalIncome);
+      el('fundNeeded').textContent = money(c.fundNeeded);
+
+      const coverage = Math.min(100, c.totalIncome / c.budget * 100);
+      const fund = Math.max(0, 100 - coverage);
+      el('coveragePct').textContent = pct(coverage);
+      el('fundPct').textContent = pct(fund);
+      el('coverageBar').style.width = coverage + '%';
+      el('fundBar').style.width = fund + '%';
+
+      const scenarios = [fee - 100, fee - 50, fee, fee + 50, fee + 100].filter(x => x >= 400 && x <= 800);
+      el('scenarioRows').innerHTML = scenarios.map(s => {
+        const r = calc(s);
+        return `<tr><td>${s === fee ? 'Current' : money(s)}</td><td>${money(s)}</td><td>${money(r.feeIncome)}</td><td>${money(r.totalIncome)}</td><td>${money(r.fundNeeded)}</td></tr>`;
+      }).join('');
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', update);
+    } else {
+      update();
+    }
+  </script>
+</body>
+</html>
